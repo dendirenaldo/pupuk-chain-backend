@@ -1,0 +1,488 @@
+{
+    "abi": [
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "spjbNumber",
+                    "type": "string"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "distributorName",
+                    "type": "string"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "retailerName",
+                    "type": "string"
+                }
+            ],
+            "name": "SPJBCreated",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_spjbNumber",
+                    "type": "string"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "_spjbYear",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_spjbType",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_spjbKop",
+                    "type": "string"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "id",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "role",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.Distributor",
+                    "name": "_distributor",
+                    "type": "tuple"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "id",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "role",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.Retailer",
+                    "name": "_retailer",
+                    "type": "tuple"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "position",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint16",
+                            "name": "priority",
+                            "type": "uint16"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "location",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.Approval[]",
+                    "name": "_approvers",
+                    "type": "tuple[]"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string[]",
+                            "name": "subRegions",
+                            "type": "string[]"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.Region[]",
+                    "name": "_regions",
+                    "type": "tuple[]"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "fertilizerTypeId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "fertilizerType",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "quantity",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "month",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.FertilizerSale[]",
+                    "name": "_realisations",
+                    "type": "tuple[]"
+                }
+            ],
+            "name": "createSPJB",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getAllSPJBKeys",
+            "outputs": [
+                {
+                    "internalType": "string[]",
+                    "name": "",
+                    "type": "string[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_spjbNumber",
+                    "type": "string"
+                }
+            ],
+            "name": "getApprovers",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "position",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint16",
+                            "name": "priority",
+                            "type": "uint16"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "location",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.Approval[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_spjbNumber",
+                    "type": "string"
+                }
+            ],
+            "name": "getFertilizerSales",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "fertilizerTypeId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "fertilizerType",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "quantity",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "month",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.FertilizerSale[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_spjbNumber",
+                    "type": "string"
+                }
+            ],
+            "name": "getRegions",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string[]",
+                            "name": "subRegions",
+                            "type": "string[]"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.Region[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_spjbNumber",
+                    "type": "string"
+                }
+            ],
+            "name": "getSPJB",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "spjbNumber",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "Number",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "spjbYear",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "spjbType",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "spjbKop",
+                            "type": "string"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "id",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "role",
+                                    "type": "string"
+                                }
+                            ],
+                            "internalType": "struct SPJBContract.Distributor",
+                            "name": "distributor",
+                            "type": "tuple"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "id",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "role",
+                                    "type": "string"
+                                }
+                            ],
+                            "internalType": "struct SPJBContract.Retailer",
+                            "name": "retailer",
+                            "type": "tuple"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "string",
+                                    "name": "name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "position",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "uint16",
+                                    "name": "priority",
+                                    "type": "uint16"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "location",
+                                    "type": "string"
+                                }
+                            ],
+                            "internalType": "struct SPJBContract.Approval[]",
+                            "name": "approvers",
+                            "type": "tuple[]"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "string",
+                                    "name": "name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string[]",
+                                    "name": "subRegions",
+                                    "type": "string[]"
+                                }
+                            ],
+                            "internalType": "struct SPJBContract.Region[]",
+                            "name": "regions",
+                            "type": "tuple[]"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "fertilizerTypeId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "fertilizerType",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "quantity",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "month",
+                                    "type": "string"
+                                }
+                            ],
+                            "internalType": "struct SPJBContract.FertilizerSale[]",
+                            "name": "fertilizerSales",
+                            "type": "tuple[]"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "timestamp",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "isExist",
+                            "type": "bool"
+                        }
+                    ],
+                    "internalType": "struct SPJBContract.SPJB",
+                    "name": "",
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_spjbNumber",
+                    "type": "string"
+                }
+            ],
+            "name": "isRegistered",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]
+}
