@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { providers, Wallet, Contract } from 'ethers';
 import { abi } from './transaksi.abi.json';
-import { InsertTransaksiDto, QueryTransaksiDto } from './dto';
+import { GetFlowByFertilizerDto, InsertTransaksiDto, QueryTransaksiDto } from './dto';
 import { FindAllTransaksiInterface } from './interface';
 import { ConfigService } from '@nestjs/config';
 import { PengedarType } from 'src/general/pengedar.type';
@@ -44,9 +44,10 @@ export class TransaksiService {
     async findAll(query: QueryTransaksiDto): Promise<FindAllTransaksiInterface> {
         const wallet = new Wallet(this.walletAddress).connect(this.provider);
         const contract = new Contract(this.contractAddress, abi, wallet);
-        const transaksiKeys = await contract.getAllTransaksiIds();
+        const eventFilter = contract.filters.TransaksiCreated();
+        const events = await contract.queryFilter(eventFilter);
 
-        if (!transaksiKeys || transaksiKeys.length === 0) {
+        if (!events || events.length === 0) {
             return {
                 data: [],
                 totalData: 0,
@@ -55,15 +56,33 @@ export class TransaksiService {
         }
 
         const allTransaksiDetails = await Promise.all(
-            transaksiKeys.map(async (key) => {
-                return this.findOne(key);
+            events.reverse().map(async (event) => {
+                const transaksiId = event.args.transaksiId;
+                const transaksiData = await this.findOne(transaksiId);
+                return {
+                    ...transaksiData,
+                    transactionHash: event.transactionHash,
+                    blockNumber: event.blockNumber,
+                };
             })
         );
 
         let filteredData = allTransaksiDetails;
 
         if (typeof query.search !== 'undefined' && query.search !== null && query.search !== '') {
-            filteredData = allTransaksiDetails.filter((val, index, arr) => val.id.toString().toLowerCase().includes(query.search.toLowerCase()) || val.distributor.name.toLowerCase().includes(query.search.toLowerCase()) || val.retailer.name.toLowerCase().includes(query.search.toLowerCase()));
+            filteredData = filteredData.filter((val, index, arr) => val.id.toString().toLowerCase().includes(query.search.toLowerCase()) || val.distributor.name.toLowerCase().includes(query.search.toLowerCase()) || val.retailer.name.toLowerCase().includes(query.search.toLowerCase()));
+        }
+
+        if (typeof query.distributorId !== 'undefined' && query.distributorId !== null && query.distributorId !== 0) {
+            filteredData = filteredData.filter((val, index, arr) => +val.distributor.id === query.distributorId);
+        }
+
+        if (typeof query.pengecerId !== 'undefined' && query.pengecerId !== null && query.pengecerId !== 0) {
+            filteredData = filteredData.filter((val, index, arr) => +val.retailer.id === query.pengecerId);
+        }
+
+        if (typeof query.sourceId !== 'undefined' && query.sourceId !== null && query.sourceId !== 0) {
+            filteredData = filteredData.filter((val, index, arr) => +val.distributor.id === query.sourceId || +val.retailer.id === query.sourceId);
         }
 
         if (query.order) {
@@ -197,5 +216,76 @@ export class TransaksiService {
         } else {
             throw new UnprocessableEntityException('The combination of distributor or pengecer is incorrect.');
         }
+    }
+
+    async getFlowByFertilizer(query: GetFlowByFertilizerDto) {
+        const { data: allTransactions } = await this.findAll({
+            ...(query.distributorId && { distributorId: query.distributorId }),
+            ...(query.pengecerId && { pengecerId: query.pengecerId }),
+            ...(query.sourceId && { sourceId: query.sourceId }),
+        });
+
+        if (!allTransactions || allTransactions.length === 0) {
+            return [];
+        }
+
+        // Tentukan rentang 3 tahun terakhir
+        const currentYear = typeof query.tahun !== 'undefined' && query.tahun.toString().length === 4 ? query.tahun : new Date().getFullYear();
+        const years = [currentYear, currentYear - 1, currentYear - 2];
+
+        // Struktur untuk menampung data agregat
+        const aggregatedData: {
+            [pengedarId: number]: {
+                id: number;
+                name: string;
+                flow: { [year: number]: { year: number; pupukMasuk: number; pupukKeluar: number } };
+            };
+        } = {};
+
+        // Helper untuk inisialisasi data pengedar jika belum ada
+        const initializePengedarData = (id: number, name: string) => {
+            if (!aggregatedData[id] && id !== 0) { // ID 0 (Produsen) tidak kita lacak sebagai pengedar
+                aggregatedData[id] = { id, name, flow: {} };
+                years.forEach(year => {
+                    aggregatedData[id].flow[year] = { year, pupukMasuk: 0, pupukKeluar: 0 };
+                });
+            }
+        };
+
+        // Proses setiap transaksi
+        allTransactions.forEach((transaksi: any, _, __) => {
+            // Filter berdasarkan pupukId
+            if (transaksi.fertilizerTypeId.toString() === query.pupukId.toString()) {
+                const txYear = new Date(Number(transaksi.createdAt) * 1000).getFullYear();
+
+                // Cek apakah tahun transaksi ada dalam rentang yang ditentukan
+                if (years.includes(txYear)) {
+                    const { distributor, retailer, quantity } = transaksi;
+
+                    // Proses Distributor (Pupuk Keluar)
+                    if (distributor.id !== 0) {
+                        initializePengedarData(distributor.id, distributor.name);
+                        aggregatedData[distributor.id].flow[txYear].pupukKeluar += Number(quantity);
+                    }
+
+                    // Proses Retailer (Pupuk Masuk)
+                    if (retailer.id !== 0) { // Petani mungkin tidak memiliki ID pengedar, jadi pastikan ada
+                        initializePengedarData(retailer.id, retailer.name);
+                        aggregatedData[retailer.id].flow[txYear].pupukMasuk += Number(quantity);
+                    }
+                }
+            }
+        });
+
+        // Ubah format akhir agar sesuai dengan struktur yang diinginkan
+        const result = Object.values(aggregatedData).map(pengedar => {
+            return {
+                id: pengedar.id,
+                name: pengedar.name,
+                yearlyFlow: Object.values(pengedar.flow).sort((a, b) => b.year - a.year), // Urutkan dari tahun terbaru
+            };
+        });
+
+        return result;
     }
 }

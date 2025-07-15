@@ -12,7 +12,11 @@ export class SpjbController {
 
     @Get()
     findAll(@Query() query: QuerySpjbDto) {
-        return this.spjbService.findAll(query);
+        if (query.spjbNumber) {
+            return this.spjbService.findOne(query.spjbNumber);
+        } else {
+            return this.spjbService.findAll(query);
+        }
     }
 
     @Get(':spjbNumber')

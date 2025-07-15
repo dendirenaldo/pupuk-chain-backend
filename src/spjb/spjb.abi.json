@@ -312,11 +312,6 @@
                             "type": "string"
                         },
                         {
-                            "internalType": "string",
-                            "name": "Number",
-                            "type": "string"
-                        },
-                        {
                             "internalType": "uint256",
                             "name": "spjbYear",
                             "type": "uint256"

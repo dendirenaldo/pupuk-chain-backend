@@ -39,9 +39,10 @@ export class SpjbService {
     async findAll(query: QuerySpjbDto): Promise<FindAllSpjbInterface> {
         const wallet = new Wallet(this.walletAddress).connect(this.provider);
         const contract = new Contract(this.contractAddress, abi, wallet);
-        const spjbKeys = await contract.getAllSPJBKeys();
+        const eventFilter = contract.filters.SPJBCreated();
+        const events = await contract.queryFilter(eventFilter);
 
-        if (!spjbKeys || spjbKeys.length === 0) {
+        if (!events || events.length === 0) {
             return {
                 data: [],
                 totalData: 0,
@@ -50,19 +51,38 @@ export class SpjbService {
         }
 
         const allSpjbDetails = await Promise.all(
-            spjbKeys.map(async (key) => {
-                return this.findOne(key);
+            events.reverse().map(async (event) => {
+                const spjbNumber = event.args.spjbNumber;
+                const spjbData = await this.findOne(spjbNumber);
+                return {
+                    ...spjbData,
+                    transactionHash: event.transactionHash,
+                    blockNumber: event.blockNumber,
+                };
             })
         );
 
         let filteredData = allSpjbDetails;
 
         if (typeof query.search !== 'undefined' && query.search !== null && query.search !== '') {
-            filteredData = allSpjbDetails.filter((val, index, arr) => val.spjbNumber.toLowerCase().includes(query.search.toLowerCase()) || val.spjbYear.toString().toLowerCase().includes(query.search.toLowerCase()) || val.distributor.name.toLowerCase().includes(query.search.toLowerCase()) || val.retailer.name.toLowerCase().includes(query.search.toLowerCase()));
+            filteredData = filteredData.filter((val, index, arr) => val.spjbNumber.toLowerCase().includes(query.search.toLowerCase()) || val.spjbYear.toString().toLowerCase().includes(query.search.toLowerCase()) || val.distributor.name.toLowerCase().includes(query.search.toLowerCase()) || val.retailer.name.toLowerCase().includes(query.search.toLowerCase()));
+        }
+
+        if (typeof query.distributorId !== 'undefined' && query.distributorId !== null && query.distributorId !== 0) {
+            filteredData = filteredData.filter((val, index, arr) => +val.distributor.id === query.distributorId);
+        }
+
+        if (typeof query.pengecerId !== 'undefined' && query.pengecerId !== null && query.pengecerId !== 0) {
+            filteredData = filteredData.filter((val, index, arr) => +val.retailer.id === query.pengecerId);
+        }
+
+        if (typeof query.sourceId !== 'undefined' && query.sourceId !== null && query.sourceId !== 0) {
+            filteredData = filteredData.filter((val, index, arr) => +val.distributor.id === query.sourceId || +val.retailer.id === query.sourceId);
         }
 
         if (query.order) {
             filteredData.sort((a, b) => {
+                // Note: You might want to add 'transactionHash' or 'blockNumber' as sortable indexes.
                 const valA = a[query.order.index as string];
                 const valB = b[query.order.index as string];
                 const direction = query.order.order.toUpperCase() === 'ASC' ? 1 : -1;

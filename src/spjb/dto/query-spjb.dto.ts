@@ -37,4 +37,27 @@ export class QuerySpjbDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
+    spjbNumber?: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => typeof value == 'string' ? +value : value)
+    distributorId?: number;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => typeof value == 'string' ? +value : value)
+    pengecerId?: number;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => typeof value == 'string' ? +value : value)
+    sourceId?: number;
 }

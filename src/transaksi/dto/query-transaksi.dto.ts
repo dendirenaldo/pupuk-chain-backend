@@ -37,4 +37,22 @@ export class QueryTransaksiDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => typeof value == 'string' ? +value : value)
+    distributorId?: number;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => typeof value == 'string' ? +value : value)
+    pengecerId?: number;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => typeof value == 'string' ? +value : value)
+    sourceId?: number;
 }

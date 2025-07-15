@@ -9,6 +9,7 @@ import { PengedarModule } from './pengedar/pengedar.module';
 import { TransaksiModule } from './transaksi/transaksi.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { PupukModule } from './pupuk/pupuk.module';
+import { BlockchainModule } from './blockchain/blockchain.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PupukModule } from './pupuk/pupuk.module';
     PengedarModule,
     TransaksiModule,
     PupukModule,
+    BlockchainModule,
   ],
 })
 export class AppModule { }

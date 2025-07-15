@@ -66,7 +66,7 @@ export class Pengedar extends Model<Pengedar> {
     @Column({
         type: new DataType.STRING(191),
         allowNull: true,
-        field: 'kontak_nama'
+        field: 'kontak_email'
     })
     kontakEmail?: string;
 
@@ -112,8 +112,9 @@ export class Pengedar extends Model<Pengedar> {
     updatedAt: string;
 
     @BelongsTo(() => Pengedar, {
+        foreignKey: 'pid',
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
     })
     distributor?: Pengedar;
 

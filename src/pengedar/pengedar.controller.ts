@@ -36,7 +36,7 @@ export class PengedarController {
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @UseInterceptors(FileInterceptor('picture', {
+    @UseInterceptors(FileInterceptor('kop', {
         storage: diskStorage({
             destination: './uploads/kop',
             filename: (req, file, callback) => {
@@ -56,16 +56,16 @@ export class PengedarController {
             new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }),
         ],
         fileIsRequired: true
-    })) picture: Express.Multer.File) {
+    })) kop: Express.Multer.File) {
         if (user.role === RoleType.ADMIN) {
-            return this.pengedarService.create(data, picture.filename);
+            return this.pengedarService.create(data, kop.filename);
         } else {
             throw new ForbiddenException('Only administrator can access this endpoint.')
         }
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @UseInterceptors(FileInterceptor('picture', {
+    @UseInterceptors(FileInterceptor('kop', {
         storage: diskStorage({
             destination: './uploads/kop',
             filename: (req, file, callback) => {
@@ -85,9 +85,9 @@ export class PengedarController {
             new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }),
         ],
         fileIsRequired: false
-    })) picture?: Express.Multer.File) {
+    })) kop?: Express.Multer.File) {
         if (user.role === RoleType.ADMIN) {
-            return this.pengedarService.update(+id, data, picture?.filename);
+            return this.pengedarService.update(+id, data, kop?.filename);
         } else {
             throw new ForbiddenException('Only administrator can access this endpoint.')
         }
